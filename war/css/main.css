@@ -1,0 +1,85 @@
+body {
+	font-family: Arial;
+	background-color:#929B8A;
+}
+
+#activity_section{
+	background-color:#D9D9AB;
+	border-style: solid;
+	border-color: brown;
+	border-width: 1px;
+	/*margin-left:210px;*/
+	margin-top:10px;
+	}
+
+#activity_list {
+	padding-left:10px;
+	padding-right:10px;
+	}
+
+.activity_list_item{
+	background-color:white;
+	list-style:none;
+	margin-bottom:10px;
+	padding:5px;
+	}
+
+#dashboard{
+	height: 100px;
+	width: 200px;
+	background-color:white;
+	
+	float: right;
+	padding:5px;
+	border-style: solid;
+	border-color: brown;
+	border-width: 1px;
+	font-size:12px;
+	
+	}
+
+h1 {
+	width:200px;
+	background-color:white;
+	float:left;
+	}
+
+#banner{
+	height: 110px;
+	background-color:brown;
+	}
+
+/* Z-index of #mask must lower than #boxes .window */
+#mask {
+  position:absolute;
+  z-index:9000;
+  background-color:#000;  
+  display:none;
+}
+   
+#boxes .window {
+  position:absolute;
+  width:440px;
+  height:200px;
+  display:none;
+  z-index:9999;
+  padding:20px;
+}
+
+#boxes .window .close
+{
+	float:right;
+}
+ 
+/* Customize your modal window here, you can add background image too */
+#boxes #dialog_newuser {
+  width:375px; 
+  height:203px;
+  background-color:white;
+}
+
+#boxes #dialog_newevent {
+  width:375px; 
+  height:203px;
+  background-color:white;
+}
