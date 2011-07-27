@@ -1,5 +1,9 @@
 
 <% 
+
+import com.google.appengine.api.datastore.*
+import static com.google.appengine.api.datastore.FetchOptions.Builder.*
+
 if(session == null) {session = request.getSession(true)} 
 %>
 <html>
@@ -29,8 +33,8 @@ if(session == null) {session = request.getSession(true)}
 	    <div id="dialog_newevent" class="window">
 	        <a href="#" class="close">Close</a>
 	        <form style="width:300px;text-align:right;margin-top:50px" action="/event/create" method="get">
-	        	Event Name:<input type="text" name="eventname"><br/>
-	        	
+	        	Title:<input type="text" name="eventname"><br/>
+	        	Description:<input type="text" name="eventdesc">
 	        	<input type="submit" value="Create Event &gt;&gt;">
 	        </form>
 	    </div>
@@ -60,23 +64,84 @@ if(session == null) {session = request.getSession(true)}
 				else
 				{
 			%>
-				Hello, <% print session.getAttribute('username')%></br>
-				<a href="/account/logout">Log out</a>
+				Hello, <% print session.getAttribute('username')%>&nbsp;&nbsp;<a href="/account/logout">[Log out]</a><br/></br>
+				<ul>
+					<li>
+						<a href="">Find and Manage Friends</a><br/>
+					</li>
+					
+				</ul>
+				
 			<%
 				}
 			%>
 		</div>
 	</div>
 	
-	<div id="searchButtons">
-	<a href="#dialog_newevent" name="modal">Add Event</a>
+	<% if(session?.getAttribute('userID'))
+	{
+	%>
+	<div id="search_buttons" style="margin-top:10px">
+		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
+			<a href="index.gtpl?filter=recommended" style="color:black">Recommended</a>
+		</span>
+		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
+			<a href="index.gtpl?filter=friends" style="color:black">Friends</a>
+		</span>
+		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
+			<a href="index.gtpl?filter=following" style="color:black">Following</a>
+		</span>
+		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
+			<a href="index.gtpl?filter=friends" style="color:black">Maybe</a>
+		</span>
+		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
+			<a href="index.gtpl?filter=past" style="color:black">Past</a>
+		</span>
+		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
+			<a href="index.gtpl?filter=future" style="color:black">Future</a>
+		</span>
 	</div>
+	<%
+	}
+	%>
 	
 	<div id="activity_section">
+		<% if(session?.getAttribute('userID'))
+		{
+		%>
+		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center;float:right">
+			<a href="#dialog_newevent" style="color:black" name="modal">Add Event</a>
+		</span><br/>
+		<%
+		}
+		%>
 		<ul id="activity_list">
-			<% 30.times {%>
-			<li class="activity_list_item">Test item</li>
-			<% } %>
+			<% 
+			for(event in datastore.prepare(new Query("event")).asIterable()) {
+			%>
+			<li class="activity_list_item">
+				<div style="margin-top:10px">
+					<span style="background-color:white;padding:5px;width:100px;text-align:center">
+						<a href="#" style="color:black">Overview</a>
+					</span>
+					<span style="background-color:white;padding:5px;width:100px;text-align:center">
+						<a href="#" style="color:black">Attendees</a>
+					</span>
+				</div>
+				<div style="float:right;width:200px">
+					Created by: <a href="/account/info/<% print event['creatorUserID']%>"><% print event['creatorUserName']%></a></br>
+					What do you say? 
+					<a href="/event/signup/<% print event['eventID']%>">Yeah</a> 
+					<a href="/event/ignore/<% print event['eventID']%>">No</a> 
+					<a href="/event/ignore/<% print event['eventID']%>">Maybe</a>
+				</div>
+				<h2><% print event['eventName']%></h2>
+				<div style="height:100px">
+					<% print event['eventDesc']%>
+				</div>
+			</li>
+			<% } 
+			%>
 		</ul>
 	</div>
 	

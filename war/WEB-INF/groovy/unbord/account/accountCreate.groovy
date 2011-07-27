@@ -49,7 +49,7 @@ if(params.email ==~ validEmailPattern)
 		session.setAttribute('userID',uuid)
 		session.setAttribute('username',params.username)
 		
-		forward '/'
+		redirect '/'
 
 	}
 	else if(!passwordVerifies)
@@ -80,5 +80,5 @@ else
 	println "Invalid email"
 }
 
-redirect "/"
+
 	
