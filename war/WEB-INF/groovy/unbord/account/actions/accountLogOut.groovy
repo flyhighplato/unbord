@@ -1,4 +1,4 @@
-package unbord.account
+package unbord.account.actions
 
 if(session == null)
 {

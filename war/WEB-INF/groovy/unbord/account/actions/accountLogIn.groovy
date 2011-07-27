@@ -1,4 +1,4 @@
-package unbord.account
+package unbord.account.actions
 import com.google.appengine.api.datastore.*
 import static com.google.appengine.api.datastore.FetchOptions.Builder.*
 import java.security.MessageDigest

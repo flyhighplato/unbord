@@ -1,4 +1,4 @@
-package unbord.event
+package unbord.event.actions
 
 import com.google.appengine.api.datastore.*
 import static com.google.appengine.api.datastore.FetchOptions.Builder.*
