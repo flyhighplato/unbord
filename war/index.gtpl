@@ -19,7 +19,7 @@ if(session == null) {session = request.getSession(true)}
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> 
 	<script type="text/javascript" src="/js/modal.js"></script>
 </head>
-<body>
+<body id="tab1">
 
 	<div id="boxes">
 	    <div id="dialog_newuser" class="window">
@@ -83,76 +83,78 @@ if(session == null) {session = request.getSession(true)}
 	<% if(session?.getAttribute('userID'))
 	{
 	%>
-	<div id="search_buttons" style="margin-top:10px">
-		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
-			<a href="index.gtpl?filter=recommended" style="color:black">Recommended</a>
-		</span>
-		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
-			<a href="index.gtpl?filter=friends" style="color:black">Friends</a>
-		</span>
-		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
-			<a href="index.gtpl?filter=following" style="color:black">Following</a>
-		</span>
-		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
-			<a href="index.gtpl?filter=friends" style="color:black">Maybe</a>
-		</span>
-		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
-			<a href="index.gtpl?filter=past" style="color:black">Past</a>
-		</span>
-		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center">
-			<a href="index.gtpl?filter=future" style="color:black">Future</a>
-		</span>
-	</div>
+		
 	<%
 	}
 	%>
 	
 	<div id="activity_section">
 		<% if(session?.getAttribute('userID'))
-		{
-		%>
-		<span style="background-color:white;border:solid;padding:5px;width:100px;text-align:center;float:right">
-			<a href="#dialog_newevent" style="color:black" name="modal">Add Event</a>
-		</span><br/>
-		<%
-		}
-		%>
-		<ul id="activity_list">
-			<% 
-			def allEvents = EventEntity.getAllUpcomingEvents(30)
-			
-			for(event in allEvents)
 			{
-			
-			
 			%>
-			<li class="activity_list_item">
-				<div style="margin-top:10px">
-					<span style="background-color:white;padding:5px;width:100px;text-align:center">
-						<a href="#" style="color:black">Overview</a>
-					</span>
-					<span style="background-color:white;padding:5px;width:100px;text-align:center">
-						<a href="#" style="color:black">Attendees</a>
-					</span>
-				</div>
-				<div style="float:right;width:200px">
-					Created by: <a href="/account/info/<% print event.getCreatorAccount().getKeyAsString()%>"><% print event.getCreatorAccount().getUserName()%></a></br>
-					What do you say? 
-					<a href="/event/signup/<% print event.getKeyAsString()%>">Yeah</a> 
-					<a href="/event/ignore/<% print event.getKeyAsString()%>">No</a> 
-					<a href="/event/ignore/<% print event.getKeyAsString()%>">Maybe</a>
-				</div>
-				<h2><% print event.eventName %></h2>
-				<div style="height:100px">
-					<% print event.getEventDesc()%>
-				</div>
-			</li>
-			<%
-				
+		<div>
+			<ul id="tabnav">
+				<li class="tab1"><a href="index.gtpl?filter=recommended">Recommended</a></li> 
+				<li class="tab2"><a href="index.gtpl?filter=friends">Friends</a></li> 
+				<li class="tab3"><a href="index.gtpl?filter=following">Following</a></li> 
+				<li class="tab4"><a href="index.gtpl?filter=maybe">Maybe</a></li> 
+				<li class="tab5"><a href="index.gtpl?filter=past">Past</a></li> 
+				<li class="tab6"><a href="index.gtpl?filter=future">Future</a></li> 
+			</ul>
+		</div>
+		<%
 			}
-			 
+		%>
+		<div id="activity_list_section">
+			<% if(session?.getAttribute('userID'))
+			{
 			%>
-		</ul>
+			<span id="add_activity_button">
+				<a href="#dialog_newevent" style="color:black" name="modal"><span>+</span>Add Event</a>
+			</span><br/>
+			<%
+			}
+			%>
+			<ul id="activity_list">
+				<% 
+				def allEvents = EventEntity.getAllUpcomingEvents(30)
+				
+				for(event in allEvents)
+				{
+
+				%>
+				<li class="activity_list_item_collapsed">
+					
+					
+					<table style="width:100%">
+						<tr>
+							<td style="width:85%">
+								<h2><% print event.eventName %></h2>
+								<p>
+									<% print event.getEventDesc()%>
+								</p>
+							</td>
+							<td align="right" valign="top">
+								<p style="text-align:left">
+									By <a href="/account/info/<% print event.getCreatorAccount().getKeyAsString()%>"><% print event.getCreatorAccount().getUserName()%></a>
+								</p>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2" align="right">
+								<a href="#">More...</a>
+							</td>
+						</tr>
+					</table>
+					
+				</li>
+				<%
+					
+				}
+				 
+				%>
+			</ul>
+		</div>
 	</div>
 	
 	

@@ -32,7 +32,6 @@ class EventEntity {
 		eventEntity = eventEntity_in
 		eventName = eventEntity_in[eventNameFieldName]
 		eventDesc = eventEntity_in[eventDescFieldName]
-		
 	}
 	
 	protected static getByEntity(Entity eventEntity_in)
