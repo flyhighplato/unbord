@@ -1,13 +1,6 @@
 package unbord.account.actions
+import unbord.session.UnbordSession
 
-if(session == null)
-{
-	session = request.getSession(false)
-}
-	
-if(session!=null)
-{
-	session.invalidate()
-}
+UnbordSession.updateSessionAccount(session,request,null)
 
 redirect '/'

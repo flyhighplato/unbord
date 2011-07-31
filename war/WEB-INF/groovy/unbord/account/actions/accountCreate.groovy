@@ -1,6 +1,7 @@
 package unbord.account.actions
 
 import unbord.account.AccountEntity
+import unbord.session.UnbordSession
 
 def validEmailPattern = ~/(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/
 
@@ -8,17 +9,10 @@ if(params.password == params.verifypassword)
 {
 	try{
 		AccountEntity accountEntity = new AccountEntity(params.email,params.username,params.password)
+		//System.out.println("hashedPassword:" + accountEntity.getPasswordHash())
 		accountEntity.save();
 		
-		if(session==null)
-		{
-			session = request.getSession(true)
-			session.setMaxInactiveInterval(1209600)
-		}
-		
-		
-		session.setAttribute('userID',accountEntity.getKeyAsString())
-		session.setAttribute('username',accountEntity.getUserName())
+		UnbordSession.updateSessionAccount(session,request,accountEntity)
 		
 		redirect '/'
 	}

@@ -18,7 +18,13 @@ public class AccountEntity {
 	String email = ""
 	String userName = ""
 	String passwordHash = ""
-	boolean isNew = false;
+	
+	static protected String entityTypeName = "account"
+	static protected String emailFieldName = "email"
+	static protected String userNameFieldName = "userName"
+	static protected String passwordHashFieldName = "passwordHash"
+	
+	static protected datastore = DatastoreServiceFactory.getDatastoreService()
 	
 	static def validEmailPattern = ~/(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/
 	
@@ -28,15 +34,22 @@ public class AccountEntity {
 		setEmail(email_in)
 		setPassword(password_in)
 		
-		accountEntity = new Entity("account")
-		isNew = true;
+		accountEntity = new Entity(entityTypeName)
+	}
+	
+	protected AccountEntity(Entity accountEntity_in)
+	{
+		userName = accountEntity_in[userNameFieldName]
+		email = accountEntity_in[emailFieldName]
+		passwordHash = accountEntity_in[passwordHashFieldName]
+		accountEntity = accountEntity_in
 	}
 	
 	public boolean setUserName(String username_in)
 	{
 		if(username_in)
 		{
-			if(isUniqueUserName(username_in, DatastoreServiceFactory.getDatastoreService()))
+			if(isUniqueUserName(username_in))
 			{
 				userName = username_in
 				return true;
@@ -58,12 +71,7 @@ public class AccountEntity {
 	{
 		if(password_in)
 		{
-			//Keep only the hash of the password
-			def md = MessageDigest.getInstance("SHA-256")
-			def passwordHashBytes = md.digest(password_in.toString().getBytes())
-			def bigIntHash = new BigInteger(1,passwordHashBytes)
-		
-			passwordHash = bigIntHash.toString(16)
+			passwordHash = hashPassword(password_in)
 			return true;
 		}
 		else
@@ -79,7 +87,7 @@ public class AccountEntity {
 	{
 		if(email_in ==~ validEmailPattern)
 		{
-			if(isUniqueEmail(email_in,DatastoreServiceFactory.getDatastoreService()))
+			if(isUniqueEmail(email_in))
 			{
 				email = email_in
 				return true;
@@ -110,25 +118,25 @@ public class AccountEntity {
 	
 	void save()
 	{
-		accountEntity['userName']=userName
-		accountEntity['email']=email
-		accountEntity['passwordHash']=passwordHash
+		accountEntity[userNameFieldName]=userName
+		accountEntity[emailFieldName]=email
+		accountEntity[passwordHashFieldName]=passwordHash
 		
 		accountEntity.save()
 	}
 	
-	static public boolean isUniqueUserName(String userName, BaseDatastoreService datastore)
+	static public boolean isUniqueUserName(String userName)
 	{
-		def accountQuery = new Query("account")
-		accountQuery.addFilter('username',Query.FilterOperator.EQUAL,userName)
+		def accountQuery = new Query(entityTypeName)
+		accountQuery.addFilter(userNameFieldName,Query.FilterOperator.EQUAL,userName)
 		
 		return datastore.prepare(accountQuery).asList(withLimit(1)).size() == 0	
 	}
 	
-	static public boolean isUniqueEmail(String email, BaseDatastoreService datastore)
+	static public boolean isUniqueEmail(String email)
 	{
-		def emailQuery = new Query("account")
-		emailQuery.addFilter('email',Query.FilterOperator.EQUAL,email)
+		def emailQuery = new Query(entityTypeName)
+		emailQuery.addFilter(emailFieldName,Query.FilterOperator.EQUAL,email)
 		
 		return datastore.prepare(emailQuery).asList(withLimit(1)).size() == 0
 	}
@@ -138,5 +146,52 @@ public class AccountEntity {
 		return email ==~ validEmailPattern
 	}
 	
+	static public String hashPassword(String password_in)
+	{
+		def md = MessageDigest.getInstance("SHA-256")
+		def passwordHashBytes = md.digest(password_in.toString().getBytes())
+		def bigIntHash = new BigInteger(1,passwordHashBytes)
+		return bigIntHash.toString(16)
+	}
+	
+	static public AccountEntity getByUsernameAndPassword(String username_in, String password_in)
+	{
+		def accountQuery = new Query(entityTypeName)
+		accountQuery.addFilter(userNameFieldName,Query.FilterOperator.EQUAL, username_in)
+		accountQuery.addFilter(passwordHashFieldName,Query.FilterOperator.EQUAL,hashPassword(password_in))
+		
+		def entities = datastore.prepare(accountQuery).asList(withLimit(1))
+		
+		if(entities.size()>0)
+		{
+			return new AccountEntity(entities.getAt(0))
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	static public AccountEntity getByKey(Key entityKey_in)
+	{
+		def accountQuery = new Query(entityTypeName)
+		accountQuery.addFilter(Entity.KEY_RESERVED_PROPERTY,Query.FilterOperator.EQUAL, entityKey_in)
+		
+		def entities = datastore.prepare(accountQuery).asList(withLimit(1))
+		
+		if(entities.size()>0)
+		{
+			return new AccountEntity(entities.getAt(0))
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	static public AccountEntity getByKey(String entityKey_in)
+	{
+		return getByKey(KeyFactory.stringToKey(entityKey_in))
+	}
 	
 }
